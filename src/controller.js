@@ -74,6 +74,7 @@ class Controller {
   runApp() {
     app.listen(port, () => {
       console.log(`App listening on port ${port}!`);
+      console.error('press CTRL+C to exit');
     });
   }
 }

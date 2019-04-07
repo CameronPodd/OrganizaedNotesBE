@@ -2,7 +2,7 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 
 const url = "mongodb://localhost:27017/quicknotes";
-//const url = "mongodb+srv://cbpodd:1yFNfus7yipU3xMd@quicknotesmongodb-9lqnf.mongodb.net/test?retryWrites=true";
+//const url = "mongodb+srv://cbpodd:1yFNfus7yipU3xMd@quicknotesmongodb-9lqnf.mongodb.net/quicknotes?retryWrites=true";
 
 module.exports = class MongoDB {
   
