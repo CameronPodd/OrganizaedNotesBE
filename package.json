@@ -1,0 +1,22 @@
+{
+  "name": "organizednotesbe",
+  "version": "1.0.0",
+  "description": "Backend for LEFT's Programming Assignment",
+  "main": "src/controller.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CameronPodd/OrganizedNotesBE.git"
+  },
+  "author": "Cameron Podd",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CameronPodd/OrganizedNotesBE/issues"
+  },
+  "homepage": "https://github.com/CameronPodd/OrganizedNotesBE#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
