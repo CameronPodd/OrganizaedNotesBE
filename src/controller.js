@@ -5,6 +5,16 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const MongoDB = require('./MongoDB');
 
+const OK200 = {
+  cod: 200,
+  msg: "Success"
+};
+
+const ISE500 = {
+  cod: 500,
+  msg: "Internal Server Error"
+}
+
 class Controller {
   constructor(app, port) {
 
@@ -13,15 +23,7 @@ class Controller {
 
     this.port = port;
 
-    this.OK200 = {
-      cod: 200,
-      msg: "Success"
-    };
 
-    this.ISE500 = {
-      cod: 500,
-      msg: "Internal Server Error"
-    }
 
     this.addGet(app);
 
@@ -35,35 +37,39 @@ class Controller {
 
   addGet(app) {
     app.get('/cards', (req, res) => {
-      let jsonres = this.OK200;
-      jsonres["cards"] = {
-        today: [],
-        yesterday: [],
-        week: [],
-        month: [],
-        year: [],
-        old: []
-      };
+      let jsonres = OK200;
       res.contentType = "application/json";
-      res.send(JSON.stringify(jsonres));
+
+      let sm = req.query.startMonth;
+      let em = req.query.endMonth;
+      let sd = req.query.startDay;
+      let ed = req.query.endDay;
+      let query = {};
+      if (sm === -1) {
+        query["month"] = {
+          $lte: em,
+        };
+      } else {
+        query["month"] = {
+          $gte: sm,
+          $lte: em,
+        };
+        query["day"] = {
+          $gte: sd,
+          $lte: ed
+        };
+      }
+
+      MongoDB.getNotes(query, (result) => {
+        jsonres["cards"] = result;
+        res.send(JSON.stringify(jsonres));
+      })
     });
   }
 
   addPost(app) {
     app.post('/cards', (req, res) => {
-      let note = {
-        title: req.body.title,
-        body: req.body.body,
-        "time": {
-          "month": req.body.time.month,
-          "day": req.body.time.day,
-          "hours": req.body.time.hours,
-          "minutes": req.body.time.minutes,
-          "seconds": req.body.time.seconds,
-          "milliseconds": req.body.time.milliseconds
-        },
-        links: req.body.links
-      };
+      let note = this.getPutPostParams(req);
 
       res.contentType = "application/json";
 
@@ -80,11 +86,13 @@ class Controller {
     app.put('/cards/:id', (req, res) => {
       let id = req.params.id;
 
-      let note = this.getParams(req);
+      let note = this.getPutPostParams(req);
 
       MongoDB.updateNote(id, note);
 
-      res.send(JSON.stringify(this.OK200));
+      res.contentType = "application/json";
+
+      res.send(JSON.stringify(OK200));
     });
   }
 
@@ -94,14 +102,16 @@ class Controller {
 
       MongoDB.deleteNote(id);
 
-      res.send(JSON.stringify(this.OK200));
+      res.contentType = "application/json";
+
+      res.send(JSON.stringify(OK200));
     });
   }
 
   runApp() {
     app.listen(port, () => {
       console.log(`Quick Notes API running on port ${port}!`);
-      console.error('press CTRL+C to exit');
+      console.log('press CTRL+C to exit');
     });
 
     MongoDB.getAllNotes((res) => {
@@ -109,7 +119,7 @@ class Controller {
     })
   }
 
-  getParams(req) {
+  getPutPostParams(req) {
     let note = {};
 
     if (req.body.title) {
@@ -119,6 +129,10 @@ class Controller {
       note["body"] = req.body.body;
     }
     if (req.body.time) {
+      note["time"] = {};
+      if (req.body.time.year) {
+        note["time"]["year"] = req.body.time.year;
+      }
       if (req.body.time.month) {
         note["time"]["month"] = req.body.time.month;
       }
