@@ -36,75 +36,80 @@ class Controller {
   }
 
   addGet(app) {
-    app.get('/cards', (req, res) => {
+    app.get('/api/cards/date', (req, res) => {
       let jsonres = OK200;
-      res.contentType = "application/json";
 
-      let sm = req.query.startMonth;
-      let em = req.query.endMonth;
-      let sd = req.query.startDay;
-      let ed = req.query.endDay;
+      let sm = parseInt(req.query.startMonth);
+      let em = parseInt(req.query.endMonth);
+      let sd = parseInt(req.query.startDay);
+      let ed = parseInt(req.query.endDay);
       let query = {};
-      if (sm === -1) {
-        query["month"] = {
-          $lte: em,
-        };
-      } else {
-        query["month"] = {
-          $gte: sm,
-          $lte: em,
-        };
-        query["day"] = {
-          $gte: sd,
-          $lte: ed
-        };
-      }
+
+      query["time.month"] = {
+        $gte: sm,
+        $lte: em
+      };
+      query["time.day"] = {
+        $gte: sd,
+        $lte: ed
+      };
 
       MongoDB.getNotes(query, (result) => {
         jsonres["cards"] = result;
-        res.send(JSON.stringify(jsonres));
+        res.json(jsonres);
       })
     });
+
+    app.get('/api/cards', (req, res) => {
+      let jsonres = OK200;
+
+      MongoDB.getAllNotes((result) => {
+        jsonres["cards"] = result;
+        res.json(jsonres);
+      })
+    });
+
+    app.get('/api/cards/:id', (req, res) => {
+      let jsonres = OK200;
+
+      MongoDB.getNote(req.params.id, (result) => {
+        jsonres["cards"] = result;
+        res.json(jsonres);
+      })
+    })
   }
 
   addPost(app) {
-    app.post('/cards', (req, res) => {
+    app.post('/api/cards', (req, res) => {
       let note = this.getPutPostParams(req);
 
-      res.contentType = "application/json";
-
-      let resBody = this.OK200;
-
       MongoDB.addNote(note, (id) => {
+        let resBody = OK200;
         resBody["insertedId"] = id;
-        res.send(JSON.stringify(resBody));
+        res.json(resBody);
       });
     });
   }
 
   addPut(app) {
-    app.put('/cards/:id', (req, res) => {
+    app.put('/api/cards/:id', (req, res) => {
       let id = req.params.id;
 
       let note = this.getPutPostParams(req);
 
       MongoDB.updateNote(id, note);
 
-      res.contentType = "application/json";
-
-      res.send(JSON.stringify(OK200));
+      res.json(OK200);
     });
   }
 
   addDelete(app) {
-    app.delete('/cards/:id', (req, res) => {
+    app.delete('/api/cards/:id', (req, res) => {
       let id = req.params.id;
 
       MongoDB.deleteNote(id);
 
-      res.contentType = "application/json";
-
-      res.send(JSON.stringify(OK200));
+      res.json(OK200);
     });
   }
 
@@ -113,10 +118,6 @@ class Controller {
       console.log(`Quick Notes API running on port ${port}!`);
       console.log('press CTRL+C to exit');
     });
-
-    MongoDB.getAllNotes((res) => {
-      console.log(res);
-    })
   }
 
   getPutPostParams(req) {

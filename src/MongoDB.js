@@ -1,8 +1,7 @@
 const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 
-const url = "mongodb://localhost:27017/quicknotes";
-//const url = "mongodb+srv://cbpodd:1yFNfus7yipU3xMd@quicknotesmongodb-9lqnf.mongodb.net/quicknotes?retryWrites=true";
+const url = "mongodb+srv://cbpodd:1yFNfus7yipU3xMd@quicknotesmongodb-9lqnf.mongodb.net/quicknotes?retryWrites=true";
 
 module.exports = class MongoDB {
   
@@ -32,7 +31,7 @@ module.exports = class MongoDB {
         throw err;
       }
       let dbo = db.db("quicknotes");
-      dbo.collection("notes").findOne({"_id": ObjectID(id)}).toArray((err, res) => {
+      dbo.collection("notes").findOne({"_id": ObjectID(id)}, (err, res) => {
         if (err) {
           console.log("Error Finding Notes")
           throw err;
