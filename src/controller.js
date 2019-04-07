@@ -162,7 +162,7 @@ class Controller {
 }
     
 const app = express();
-const port = 8000;
+const port = 8080;
 const cont = new Controller(app, port);
 
 cont.runApp();
