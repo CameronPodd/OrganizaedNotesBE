@@ -107,13 +107,11 @@ module.exports = class MongoDB {
         throw err;
       }
       let dbo = db.db("quicknotes");
-      console.log(ObjectID(id));
       dbo.collection("notes").updateOne({"_id": ObjectID(id)}, { $set: newvalues }, (err, res) => {
         if (err) {
           console.error("Update Error");
           throw err;
         }
-        console.log(res.result);
         db.close();
       });
     });

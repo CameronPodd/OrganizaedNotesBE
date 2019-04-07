@@ -27,6 +27,10 @@ class Controller {
 
     this.addPost(app);
 
+    this.addPut(app);
+
+    this.addDelete(app);
+
   }
 
   addGet(app) {
@@ -57,7 +61,8 @@ class Controller {
           "minutes": req.body.time.minutes,
           "seconds": req.body.time.seconds,
           "milliseconds": req.body.time.milliseconds
-        }
+        },
+        links: req.body.links
       };
 
       res.contentType = "application/json";
@@ -71,11 +76,73 @@ class Controller {
     });
   }
 
+  addPut(app) {
+    app.put('/cards/:id', (req, res) => {
+      let id = req.params.id;
+
+      let note = this.getParams(req);
+
+      MongoDB.updateNote(id, note);
+
+      res.send(JSON.stringify(this.OK200));
+    });
+  }
+
+  addDelete(app) {
+    app.delete('/cards/:id', (req, res) => {
+      let id = req.params.id;
+
+      MongoDB.deleteNote(id);
+
+      res.send(JSON.stringify(this.OK200));
+    });
+  }
+
   runApp() {
     app.listen(port, () => {
       console.log(`Quick Notes API running on port ${port}!`);
       console.error('press CTRL+C to exit');
     });
+
+    MongoDB.getAllNotes((res) => {
+      console.log(res);
+    })
+  }
+
+  getParams(req) {
+    let note = {};
+
+    if (req.body.title) {
+      note["title"] = req.body.title;
+    }
+    if (req.body.body) {
+      note["body"] = req.body.body;
+    }
+    if (req.body.time) {
+      if (req.body.time.month) {
+        note["time"]["month"] = req.body.time.month;
+      }
+      if (req.body.time.day) {
+        note["time"]["day"] = req.body.time.day;
+      }
+      if (req.body.time.hours) {
+        note["time"]["hours"] = req.body.time.hours;
+      }
+      if (req.body.time.minutes) {
+        note["time"]["minutes"] = req.body.time.minutes;
+      }
+      if (req.body.time.seconds) {
+        note["time"]["seconds"] = req.body.time.seconds;
+      }
+      if (req.body.time.milliseconds) {
+        note["time"]["milliseconds"] = req.body.time.milliseconds;
+      }
+    }
+    if (req.body.links) {
+      note["links"] = req.body.links;
+    }
+
+    return note;
   }
 }
     
