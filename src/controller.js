@@ -139,6 +139,8 @@ class Controller {
       // Get the parameters from req
       let note = this.getPutPostParams(req);
 
+      console.log(note);
+
       try {
         // Add a note to the database
         MongoDB.addNote(note, (id) => {
@@ -221,7 +223,6 @@ class Controller {
   getPutPostParams(req) {
     // Create empty JSON Object
     let note = {};
-
     // Add a title (if it exists)
     if (req.body.title) {
       note["title"] = req.body.title;
@@ -238,13 +239,13 @@ class Controller {
       if (req.body.time.year) {
         note["time"]["year"] = req.body.time.year;
       }
-      if (req.body.time.month) {
+      if (req.body.time.month != undefined) {
         note["time"]["month"] = req.body.time.month;
       }
       if (req.body.time.day) {
         note["time"]["day"] = req.body.time.day;
       }
-      if (req.body.time.hours) {
+      if (req.body.time.hours != undefined) {
         note["time"]["hours"] = req.body.time.hours;
       }
       if (req.body.time.minutes) {
